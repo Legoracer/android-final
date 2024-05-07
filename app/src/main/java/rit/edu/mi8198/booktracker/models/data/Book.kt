@@ -1,108 +1,67 @@
 package rit.edu.mi8198.booktracker.models.data
 
-
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.ColumnInfo
+import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
+import com.google.gson.JsonElement
+import rit.edu.mi8198.booktracker.models.Converter
 
+@Entity(tableName = "book")
+@TypeConverters(Converter.JsonElementConverter::class, Converter.AuthorListConverter::class, Converter.StringListConverter::class, Converter.IntListConverter::class)
 data class Book(
-    @SerializedName("authors")
-    val authors: List<Author>,
-    @SerializedName("covers")
-    val covers: List<Int>,
-    @SerializedName("created")
-    val created: Created,
-    @SerializedName("description")
-    val description: Description,
-    @SerializedName("excerpts")
-    val excerpts: List<Excerpt>,
+    @PrimaryKey
     @SerializedName("key")
+    @ColumnInfo(name = "key")
     val key: String,
-    @SerializedName("last_modified")
-    val lastModified: LastModified,
-    @SerializedName("latest_revision")
-    val latestRevision: Int,
-    @SerializedName("links")
-    val links: List<Link>,
-    @SerializedName("revision")
-    val revision: Int,
-    @SerializedName("subject_people")
-    val subjectPeople: List<String>,
-    @SerializedName("subject_places")
-    val subjectPlaces: List<String>,
-    @SerializedName("subjects")
-    val subjects: List<String>,
+
     @SerializedName("title")
+    @ColumnInfo(name = "title")
     val title: String,
-    @SerializedName("type")
-    val type: Type
+
+    @SerializedName("description")
+    @TypeConverters(Converter.JsonElementConverter::class)
+    @ColumnInfo(name = "description")
+    val description: JsonElement?,
+
+    @ColumnInfo(name = "currentPage")
+    var currentPage: Int = 0,
+
+    @SerializedName("authors")
+    @TypeConverters(Converter.AuthorListConverter::class)
+    @ColumnInfo(name = "authors")
+    val authors: List<Author>,
+
+    @SerializedName("subjects")
+    @TypeConverters(Converter.StringListConverter::class)
+    @ColumnInfo(name = "subjects")
+    val subjects: List<String>,
+
+    @SerializedName("covers")
+    @TypeConverters(Converter.IntListConverter::class)
+    @ColumnInfo(name = "covers")
+    val covers: List<Int>,
+
+    var isFavorite: Boolean?
 ) {
+    val actualDescription: String
+        get() = when {
+            description == null -> ""
+            description.isJsonPrimitive -> description.asString
+            description.isJsonObject -> description.asJsonObject.get("value").asString
+            else -> "No description available"
+        }
+
     data class Author(
         @SerializedName("author")
+        @ColumnInfo(name="author")
         val author: Author,
-        @SerializedName("type")
-        val type: Type
     ) {
         data class Author(
             @SerializedName("key")
-            val key: String
-        )
-
-        data class Type(
-            @SerializedName("key")
+            @ColumnInfo(name="key")
             val key: String
         )
     }
-
-    data class Created(
-        @SerializedName("type")
-        val type: String,
-        @SerializedName("value")
-        val value: String
-    )
-
-    data class Description(
-        @SerializedName("type")
-        val type: String,
-        @SerializedName("value")
-        val value: String
-    )
-
-    data class Excerpt(
-        @SerializedName("author")
-        val author: Author,
-        @SerializedName("comment")
-        val comment: String,
-        @SerializedName("excerpt")
-        val excerpt: String
-    ) {
-        data class Author(
-            @SerializedName("key")
-            val key: String
-        )
-    }
-
-    data class LastModified(
-        @SerializedName("type")
-        val type: String,
-        @SerializedName("value")
-        val value: String
-    )
-
-    data class Link(
-        @SerializedName("title")
-        val title: String,
-        @SerializedName("type")
-        val type: Type,
-        @SerializedName("url")
-        val url: String
-    ) {
-        data class Type(
-            @SerializedName("key")
-            val key: String
-        )
-    }
-
-    data class Type(
-        @SerializedName("key")
-        val key: String
-    )
 }

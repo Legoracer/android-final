@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,31 +12,46 @@ import androidx.navigation.compose.composable
 @Composable
 fun NavigationView(navController: NavHostController, padding: PaddingValues) {
     Box(Modifier.padding(padding)) {
-        NavHost(navController = navController, startDestination = "search") {
+        NavHost(navController = navController, startDestination = "home") {
             // Navigation bar routes
             composable(route="home") {
-                BookDetailsView("0", "0")
+                HomeView() { a:String ->
+                    navController.navigate("book_details/$a")
+                }
             }
 
             composable(route="favorites") {
-                BookDetailsView("0", "0")
+                FavoritesView() { a:String ->
+                    navController.navigate("favorite_book_details/$a")
+                }
             }
 
             composable(route="search") {
-                SearchView() { a:String, b:String ->
-                    navController.navigate("book_details/$a/$b")
+                SearchView() { a:String ->
+                    navController.navigate(a)
                 }
             }
 
             // Non-navigation bar routes
-            composable(route="book_details/{id}/{anotherId}") { backStackEntry ->
+            composable(route="book_details/{id}") { backStackEntry ->
                 val id: String = backStackEntry.arguments?.getString("id") ?: "0"
-                val anotherId: String = backStackEntry.arguments?.getString("anotherId") ?: "0"
-                BookDetailsView(id, anotherId)
+                BookDetailsView(id) { a:String ->
+                    navController.navigate("author_details/$a")
+                }
             }
 
-            composable(route="author_details") {
-                BookDetailsView("0", "0")
+            composable(route="favorite_book_details/{id}") { backStackEntry ->
+                val id: String = backStackEntry.arguments?.getString("id") ?: "0"
+                BookDetailsView(id) { a:String ->
+                    navController.navigate("author_details/$a")
+                }
+            }
+
+            composable(route="author_details/{id}") { backStackEntry ->
+                val id: String = backStackEntry.arguments?.getString("id") ?: "0"
+                AuthorView(id) { a:String ->
+                    navController.navigate("book_details/$a")
+                }
             }
         }
     }

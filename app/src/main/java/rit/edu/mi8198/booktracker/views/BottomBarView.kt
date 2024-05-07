@@ -1,9 +1,11 @@
 package rit.edu.mi8198.booktracker.views
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
@@ -17,7 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomBar(navController: NavController) {
+fun BottomBar(navController: NavController, toggleDarkTheme: ()->Unit) {
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -70,6 +72,21 @@ fun BottomBar(navController: NavController) {
                 navController.navigate("search") {
                     launchSingleTop = true
                 }
+            }
+        )
+
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = if (currentRoute == "search")
+                        Icons.Outlined.Face else Icons.Default.Face,
+                    contentDescription = "Search"
+                )
+            },
+            label = { Text("Dark Mode") },
+            selected = false,
+            onClick = {
+                toggleDarkTheme()
             }
         )
     }
